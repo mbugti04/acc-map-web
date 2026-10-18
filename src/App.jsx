@@ -26,7 +26,7 @@ function App() {
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             <img
-              src="src/assets/ACCMapLogo.png"
+              src="/images/ACCMapLogo.png"
               width="30"
               height="30"
               className="d-inline-block align-top"

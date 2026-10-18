@@ -17,19 +17,19 @@ function About() {
       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '20px', justifyContent: 'center' }}>
         <div>
           <h2>Mustafa Bugti</h2>
-          <img src="src/assets/mustafa.png" alt="Mustafa Bugti" width="400" height="400" style={{ objectFit: 'cover' }} />
+          <img src="/images/mustafa.png" alt="Mustafa Bugti" width="400" height="400" style={{ objectFit: 'cover' }} />
         </div>
         <div>
           <h2>Jangael Rosales</h2>
-          <img src="src/assets/jangael.jpg" alt="Jangael Rosales" width="400" height="400" style={{ objectFit: 'cover' }} />
+          <img src="/images/jangael.jpg" alt="Jangael Rosales" width="400" height="400" style={{ objectFit: 'cover' }} />
         </div>
         <div>
           <h2>Jun Yi He Wu</h2>
-          <img src="src/assets/jun.jpg" alt="Jun Yi He Wu" width="400" height="400" style={{ objectFit: 'cover' }} />
+          <img src="/images/jun.jpg" alt="Jun Yi He Wu" width="400" height="400" style={{ objectFit: 'cover' }} />
         </div>
         <div>
           <h2>Ricardo Flores</h2>
-          <img src="src/assets/ricardo.png" alt="Ricardo Flores" width="400" height="400" style={{ objectFit: 'cover' }} />
+          <img src="/images/ricardo.png" alt="Ricardo Flores" width="400" height="400" style={{ objectFit: 'cover' }} />
         </div>
       </div>
     </div>

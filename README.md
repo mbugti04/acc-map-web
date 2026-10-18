@@ -43,4 +43,11 @@ All of us have different levels of proficiency when it comes to using various te
 AccMap is **NOT** a permanent solution to making our world accessible. Accmap is an educational tool that addresses the needs of users who want to make their lives easier. Our institutions should always keep accessibility in mind, and not as an afterthought. Our team wants this app to address how inaccessibility affects everyone, whether we realize it or not, and give users the platform to learn more about accessibility and voice their concerns. We are working to incorporate more user interaction and to make sure that the application is web-accessible.
 
 # How to Run
+Install dependencies first:
+```
+npm install
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt   # use requirements-dev.txt to also run test_requests.py
+```
+
 Run `npm run dev:cc` to run the front-end and back-end concurrently.

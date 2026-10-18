@@ -1,10 +1,8 @@
 # app.py
 from flask import Flask, jsonify, request
-from flask_cors import CORS
 import time
 
 app = Flask(__name__)
-CORS(app)
 
 locations = [
     {
@@ -14,7 +12,7 @@ locations = [
         "marker_title": "Cro Blvd, Connecticut College",
         "marker_description": "Construction on Cro Blvd for Pedestrain Project. Recommended Route: Going through Resevoir Street or passing through Central Campus Houses (Plant, Brandford, Smith, and Burdick)",
         "vote_count": 32,
-        "image_path": "src/assets/croblvd.png",
+        "image_path": "/images/croblvd.png",
         "comments": ["How long will the construction last?"],
     },
     {
@@ -24,7 +22,7 @@ locations = [
         "marker_title": "Corner of Tilly & Bank St.",
         "marker_description": "Pedestrian Signal with lack of WAIT Locator Tone",
         "vote_count": 18,
-        "image_path": "src/assets/pedestrian.jpg",
+        "image_path": "/images/pedestrian.jpg",
         "comments": []
     },
     {
@@ -34,7 +32,7 @@ locations = [
         "marker_title": "No Sidewalk by Johnson House",
         "marker_description": "There is no sidewalk to get to Johnson House. Recommended route: through the inside of the Plex building.",
         "vote_count": 0,
-        "image_path": 'src/assets/johnson.png'
+        "image_path": '/images/johnson.png'
     },
     {
         "id": 4,
@@ -43,7 +41,7 @@ locations = [
         "marker_title": "Route 32 Corridor Study",
         "marker_description": "There is a current corridor study conducted by the Southeastern Connecticut Council of Governments (SCCOG), the City of New London, and the Connecticut Department of Transportation (CTDOT).",
         "vote_count": 5,
-        "image_path": 'src/assets/route-32.png'
+        "image_path": '/images/route-32.png'
     },
     {
         "id": 5,
@@ -52,7 +50,7 @@ locations = [
         "marker_title": "Disability Cultural Center @ Conn Opened!",
         "marker_description": "The Disability Cultural Center at Connecticut College opened in Smith/Burdick House this academic year. TThe Disability Cultural Center affirms and celebrates disability by exploring the intersectionality of identities, creating community support, celebrating disability culture, and advocating for disability justice. The Grand Opening is happening April 1, 2025! Save the Date!",
         "vote_count": 50,
-        "image_path": 'src/assets/dac.png'
+        "image_path": '/images/dac.png'
     }
 ]
 
@@ -96,6 +94,3 @@ def index():
 @app.route('/api/time')
 def get_current_time():
     return {'time': time.time()}
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000, host='0.0.0.0')
