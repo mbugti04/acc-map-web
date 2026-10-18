@@ -20,7 +20,7 @@ function ForumPost({ location }) {
 
   const handleVote = async (id, action) => {
     try {
-      await axios.post(`http://129.133.74.40:5001/locations/${id}/vote`, { action });
+      await axios.post(`/api/locations/${id}/vote`, { action });
       setVoteCount(prevCount => action === 'increment' ? prevCount + 1 : prevCount - 1);
     } catch (error) {
       console.error("Error voting:", error);

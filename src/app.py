@@ -56,11 +56,11 @@ locations = [
     }
 ]
 
-@app.route('/locations')
+@app.route('/api/locations')
 def location():
     return jsonify(locations)
 
-@app.route('/locations', methods=['POST'])
+@app.route('/api/locations', methods=['POST'])
 def add_location():
     new_location = request.get_json()
     new_location['id'] = locations[-1]['id'] + 1 if locations else 1
@@ -69,14 +69,14 @@ def add_location():
     locations.append(new_location)
     return jsonify(new_location), 201
 
-@app.route('/locations/<int:id>')
+@app.route('/api/locations/<int:id>')
 def location_by_id(id):
     for location in locations:
         if location['id'] == id:
             return jsonify(location)
     return jsonify({"message": "Location not found."})
 
-@app.route('/locations/<int:id>/vote', methods=['POST'])
+@app.route('/api/locations/<int:id>/vote', methods=['POST'])
 def vote_location(id):
     data = request.get_json()
     for location in locations:
@@ -93,9 +93,9 @@ def vote_location(id):
 def index():
     return "Hello, World!"
 
-@app.route('/time')
+@app.route('/api/time')
 def get_current_time():
     return {'time': time.time()}
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')

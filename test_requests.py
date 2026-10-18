@@ -1,7 +1,7 @@
 
 import requests
 
-BASE_URL = "http://127.0.0.1:5000"
+BASE_URL = "http://127.0.0.1:5000/api"
 
 def test_get_locations():
     response = requests.get(f"{BASE_URL}/locations")

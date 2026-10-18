@@ -12,7 +12,7 @@ function Resources() {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5001/locations').then(res => res.json()).then(data => {
+    fetch('/api/locations').then(res => res.json()).then(data => {
       setLocations(data);
     });
   }, []);
