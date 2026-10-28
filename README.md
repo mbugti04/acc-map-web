@@ -2,6 +2,8 @@
 
 https://devpost.com/software/accmap | AccMap is a First Place Winner for Wesleyan University's Annual Hackathon, WesHack 2024! 
 
+> **Project history:** The original hackathon submission, built by a team of four, is preserved at the [`v0-weshack-2024`](https://github.com/mbugti04/acc-map-web/tree/v0-weshack-2024) tag.
+
 ## Inspiration
 
 Without the endless efforts of student leaders at our college campus who organize and advocate for accessibility resources, we would not know much about what accessibility looks like in our day-to-day lives and the importance of advocating for accessibility. 
