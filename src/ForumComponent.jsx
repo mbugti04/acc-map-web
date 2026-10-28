@@ -20,8 +20,8 @@ function ForumPost({ location }) {
 
   const handleVote = async (id, action) => {
     try {
-      await axios.post(`/api/locations/${id}/vote`, { action });
-      setVoteCount(prevCount => action === 'increment' ? prevCount + 1 : prevCount - 1);
+      const response = await axios.post(`/api/locations/${id}/vote`, { action });
+      setVoteCount(response.data.vote_count);
     } catch (error) {
       console.error("Error voting:", error);
     }
@@ -29,7 +29,7 @@ function ForumPost({ location }) {
 
   return (
     <Card>
-      <Card.Img variant="top" src={location.image_path || "holder.js/100px180"} />
+      {location.image_path && <Card.Img variant="top" src={location.image_path} alt="" />}
       <Card.Body>
         <Card.Title>{location.marker_title || "No Title"}</Card.Title>
         <Card.Text>

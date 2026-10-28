@@ -60,10 +60,30 @@ def location():
 
 @app.route('/api/locations', methods=['POST'])
 def add_location():
-    new_location = request.get_json()
-    new_location['id'] = locations[-1]['id'] + 1 if locations else 1
-    new_location['vote_count'] = 0
-    new_location['comments'] = []
+    data = request.get_json(silent=True) or {}
+    try:
+        latitude = float(data['latitude'])
+        longitude = float(data['longitude'])
+    except (KeyError, TypeError, ValueError):
+        return jsonify({"message": "latitude and longitude are required numbers."}), 400
+    if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+        return jsonify({"message": "latitude or longitude is out of range."}), 400
+
+    title = str(data.get('marker_title') or '').strip()
+    if not title:
+        return jsonify({"message": "A title is required."}), 400
+
+    # Only keep known fields so clients can't set ids, votes, or comments
+    new_location = {
+        "id": locations[-1]['id'] + 1 if locations else 1,
+        "latitude": latitude,
+        "longitude": longitude,
+        "marker_title": title[:120],
+        "marker_description": str(data.get('marker_description') or '').strip()[:2000],
+        "vote_count": 0,
+        "image_path": None,
+        "comments": [],
+    }
     locations.append(new_location)
     return jsonify(new_location), 201
 
@@ -72,14 +92,13 @@ def location_by_id(id):
     for location in locations:
         if location['id'] == id:
             return jsonify(location)
-    return jsonify({"message": "Location not found."})
+    return jsonify({"message": "Location not found."}), 404
 
 @app.route('/api/locations/<int:id>/vote', methods=['POST'])
 def vote_location(id):
     data = request.get_json()
     for location in locations:
         if location['id'] == id:
-            print("location found")
             if data.get('action') == 'increment':
                 location['vote_count'] += 1
             elif data.get('action') == 'decrement':

@@ -9,16 +9,35 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css'
 import MapComponent from './MapComponent';
 import ForumComponent from './ForumComponent';
-import { Container, Navbar, Nav } from 'react-bootstrap';
+import ReportForm from './ReportForm';
+import { DEFAULT_CENTER } from './constants';
+import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 
 function App() {
   const [locations, setLocations] = useState([]);
+  const [userPosition, setUserPosition] = useState(null);
+  const [draftPin, setDraftPin] = useState(null);
 
   useEffect(() => {
     fetch('/api/locations').then(res => res.json()).then(data => {
       setLocations(data);
     });
   }, []);
+
+  // Falls back to the default map center if location is denied or unavailable
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      pos => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+      err => console.warn("Geolocation unavailable:", err.message),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
+
+  const handleCreated = (location) => {
+    setLocations(prev => [...prev, location]);
+    setDraftPin(null);
+  };
 
   return (
     <Router>
@@ -30,7 +49,7 @@ function App() {
               width="30"
               height="30"
               className="d-inline-block align-top"
-              alt="React Bootstrap logo"
+              alt="AccMap logo"
             />
             AccMap
           </Navbar.Brand>
@@ -39,6 +58,9 @@ function App() {
             <Nav.Link as={Link} to="/about">About Us</Nav.Link>
             <Nav.Link as={Link} to="/resources">Resources</Nav.Link>
           </Nav>
+          <Button variant="primary" onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)}>
+            Report an obstacle
+          </Button>
         </Container>
       </Navbar>
       <div className="container">
@@ -46,7 +68,12 @@ function App() {
           <Route path="/" element={
             <>
               <div className="map" id="map">
-                <MapComponent locations={locations} />
+                <MapComponent
+                  locations={locations}
+                  userPosition={userPosition}
+                  draftPin={draftPin}
+                  onPick={setDraftPin}
+                />
               </div>
               <div className="forum" id="forum">
                 <ForumComponent locations={locations} />
@@ -57,6 +84,14 @@ function App() {
           <Route path="/resources" element={<Resources />} />
         </Routes>
       </div>
+      {draftPin && (
+        <ReportForm
+          key={draftPin.join(',')}
+          position={draftPin}
+          onClose={() => setDraftPin(null)}
+          onCreated={handleCreated}
+        />
+      )}
     </Router>
   );
 }
