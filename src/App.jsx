@@ -5,7 +5,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import About from './About'; 
 import Resources from "./Resources"
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import './App.css'
 import MapComponent from './MapComponent';
 import ForumComponent from './ForumComponent';
@@ -19,6 +19,16 @@ const VIEWS = [
   { value: 'both', label: 'Both' },
   { value: 'forum', label: 'Feed' },
 ];
+
+function ReportButton({ onClick }) {
+  const { pathname } = useLocation();
+  if (pathname !== '/') return null;
+  return (
+    <Button variant="primary" onClick={onClick}>
+      Report an obstacle
+    </Button>
+  );
+}
 
 function loadSplit() {
   try {
@@ -107,9 +117,7 @@ function App() {
               <Nav.Link as={Link} to="/about">About Us</Nav.Link>
               <Nav.Link as={Link} to="/resources">Resources</Nav.Link>
             </Nav>
-            <Button variant="primary" onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)}>
-              Report an obstacle
-            </Button>
+            <ReportButton onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)} />
           </Navbar.Collapse>
         </Container>
       </Navbar>
