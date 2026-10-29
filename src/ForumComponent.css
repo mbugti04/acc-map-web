@@ -7,3 +7,24 @@
 .action-container .accordion {
   flex-grow: 1;
 }
+.action-container {
+  flex-wrap: wrap;
+}
+
+.action-container .accordion {
+  min-width: 12rem;
+}
+
+.forum-image {
+  height: 180px;
+  object-fit: cover;
+}
+
+.forum-list > .card + .card {
+  margin-top: 0.75rem;
+}
+
+/* The grid in feed-only view handles spacing itself */
+.view-forum .forum-list > .card + .card {
+  margin-top: 0;
+}

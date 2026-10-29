@@ -1,18 +1,136 @@
 #root {
-  margin: 0;
-  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
 }
 
-html, body {
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Home page: map and feed panes */
+.home {
+  display: flex;
+  flex-direction: column;
   height: 100%;
+  padding: 0.75rem;
+  gap: 0.75rem;
 }
 
-html {
-  display: table;
-  margin: auto;
+.view-toolbar {
+  display: flex;
+  justify-content: center;
 }
 
-body {
-  display: table-cell;
-  vertical-align: middle;
+.panes {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.panes.view-both {
+  gap: 0;
+  grid-template-columns: minmax(0, var(--map-fr)) 0.75rem minmax(320px, var(--feed-fr));
+}
+
+/* Draggable divider between map and feed */
+.split-gutter {
+  position: relative;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.split-gutter::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 3rem;
+  transform: translate(-50%, -50%);
+  border-radius: 2px;
+  background: var(--bs-secondary-bg, #dee2e6);
+  transition: background-color 0.15s, height 0.15s;
+}
+
+.split-gutter:hover::after,
+.split-gutter:focus-visible::after,
+.split-gutter.dragging::after {
+  height: 5rem;
+  background: var(--bs-primary, #0d6efd);
+}
+
+.split-gutter:focus-visible {
+  outline: none;
+}
+
+/* Keeps the map from grabbing the pointer or selecting text mid-drag */
+.panes:has(.split-gutter.dragging) {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.panes:has(.split-gutter.dragging) .map {
+  pointer-events: none;
+}
+
+.panes.view-map .forum,
+.panes.view-forum .map {
+  display: none;
+}
+
+.map {
+  min-height: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.map .leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.forum {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Feed-only view spreads the cards into a grid */
+.panes.view-forum .forum-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  align-items: start;
+  gap: 0.75rem;
+}
+
+/* Too narrow for side-by-side: stack the map above the feed */
+@media (max-width: 767.98px) {
+  .home {
+    height: auto;
+    min-height: 100%;
+  }
+
+  .panes {
+    grid-template-rows: minmax(60vh, 1fr);
+  }
+
+  .panes.view-both {
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 45vh auto;
+  }
+
+  .split-gutter {
+    display: none;
+  }
+
+  .forum {
+    overflow-y: visible;
+  }
 }

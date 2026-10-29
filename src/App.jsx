@@ -1,6 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import About from './About'; 
@@ -10,13 +10,60 @@ import './App.css'
 import MapComponent from './MapComponent';
 import ForumComponent from './ForumComponent';
 import ReportForm from './ReportForm';
-import { DEFAULT_CENTER } from './constants';
-import { Container, Navbar, Nav, Button } from 'react-bootstrap';
+import SplitGutter from './SplitGutter';
+import { DEFAULT_CENTER, DEFAULT_SPLIT } from './constants';
+import { Container, Navbar, Nav, Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+
+const VIEWS = [
+  { value: 'map', label: 'Map' },
+  { value: 'both', label: 'Both' },
+  { value: 'forum', label: 'Feed' },
+];
+
+function loadSplit() {
+  try {
+    const saved = parseFloat(localStorage.getItem('accmap-split'));
+    return saved > 0 && saved < 1 ? saved : DEFAULT_SPLIT;
+  } catch {
+    return DEFAULT_SPLIT;
+  }
+}
+
+function loadView() {
+  try {
+    const saved = localStorage.getItem('accmap-view');
+    return VIEWS.some(v => v.value === saved) ? saved : 'both';
+  } catch {
+    return 'both';
+  }
+}
 
 function App() {
   const [locations, setLocations] = useState([]);
   const [userPosition, setUserPosition] = useState(null);
   const [draftPin, setDraftPin] = useState(null);
+  const [view, setView] = useState(loadView);
+  const [split, setSplit] = useState(loadSplit);
+  const panesRef = useRef(null);
+  // fr values must sum to at least 1, or the map leaves empty space once the feed hits its minimum width
+  const splitStyle = { '--map-fr': `${split * 100}fr`, '--feed-fr': `${(1 - split) * 100}fr` };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('accmap-split', split.toFixed(3));
+    } catch {
+      // Storage can be blocked; the split still works for this visit
+    }
+  }, [split]);
+
+  const changeView = (value) => {
+    setView(value);
+    try {
+      localStorage.setItem('accmap-view', value);
+    } catch {
+      // Storage can be blocked; the toggle still works for this visit
+    }
+  };
 
   useEffect(() => {
     fetch('/api/locations').then(res => res.json()).then(data => {
@@ -41,7 +88,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar expand="lg" className="bg-body-tertiary" style={{ padding: '0.5rem 1rem', maxHeight: '60px' }}>
+      <Navbar expand="md" className="bg-body-tertiary">
         <Container fluid>
           <Navbar.Brand as={Link} to="/">
             <img
@@ -53,37 +100,58 @@ function App() {
             />
             AccMap
           </Navbar.Brand>
-          <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/about">About Us</Nav.Link>
-            <Nav.Link as={Link} to="/resources">Resources</Nav.Link>
-          </Nav>
-          <Button variant="primary" onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)}>
-            Report an obstacle
-          </Button>
+          <Navbar.Toggle aria-controls="main-nav" />
+          <Navbar.Collapse id="main-nav">
+            <Nav className="me-auto">
+              <Nav.Link as={Link} to="/">Home</Nav.Link>
+              <Nav.Link as={Link} to="/about">About Us</Nav.Link>
+              <Nav.Link as={Link} to="/resources">Resources</Nav.Link>
+            </Nav>
+            <Button variant="primary" onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)}>
+              Report an obstacle
+            </Button>
+          </Navbar.Collapse>
         </Container>
       </Navbar>
-      <div className="container">
+      <main className="app-main">
         <Routes>
           <Route path="/" element={
-            <>
-              <div className="map" id="map">
-                <MapComponent
-                  locations={locations}
-                  userPosition={userPosition}
-                  draftPin={draftPin}
-                  onPick={setDraftPin}
-                />
+            <div className="home">
+              <div className="view-toolbar">
+                <ToggleButtonGroup type="radio" name="view" value={view} onChange={changeView} aria-label="Choose what to show">
+                  {VIEWS.map(v => (
+                    <ToggleButton key={v.value} id={`view-${v.value}`} value={v.value} variant="outline-primary" size="sm">
+                      {v.label}
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
               </div>
-              <div className="forum" id="forum">
-                <ForumComponent locations={locations} />
+              <div
+                ref={panesRef}
+                className={`panes view-${view}`}
+                style={splitStyle}
+              >
+                <div className="map" id="map">
+                  <MapComponent
+                    locations={locations}
+                    userPosition={userPosition}
+                    draftPin={draftPin}
+                    onPick={setDraftPin}
+                  />
+                </div>
+                {view === 'both' && (
+                  <SplitGutter containerRef={panesRef} split={split} onChange={setSplit} />
+                )}
+                <div className="forum" id="forum">
+                  <ForumComponent locations={locations} />
+                </div>
               </div>
-            </>
+            </div>
           } />
           <Route path="/about" element={<About />} />
           <Route path="/resources" element={<Resources />} />
         </Routes>
-      </div>
+      </main>
       {draftPin && (
         <ReportForm
           key={draftPin.join(',')}

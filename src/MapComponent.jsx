@@ -13,6 +13,18 @@ function RecenterOnUser({ position }) {
   return null;
 }
 
+// Leaflet only notices window resizes, so tell it when its pane changes size
+// (view toggles, the grid reflowing, or being shown again after display: none)
+function ResizeWithContainer() {
+  const map = useMap();
+  useEffect(() => {
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(map.getContainer());
+    return () => observer.disconnect();
+  }, [map]);
+  return null;
+}
+
 function ClickToPin({ onPick }) {
   useMapEvents({
     click(e) {
@@ -24,11 +36,12 @@ function ClickToPin({ onPick }) {
 
 function MapComponent({ locations, userPosition, draftPin, onPick }) {
   return (
-    <MapContainer center={DEFAULT_CENTER} zoom={12} scrollWheelZoom={true} style={{ height: '85vh', width: '50vw'}}>
+    <MapContainer center={DEFAULT_CENTER} zoom={12} scrollWheelZoom={true}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <ResizeWithContainer />
       <RecenterOnUser position={userPosition} />
       <ClickToPin onPick={onPick} />
       {userPosition && (

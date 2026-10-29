@@ -7,7 +7,7 @@ import './ForumComponent.css'; // Add this import for custom styles
 
 function ForumComponent({ locations }) {
   return (
-    <div>
+    <div className="forum-list">
       {locations.map(location => (
         <ForumPost key={location.id} location={location} />
       ))}
@@ -29,7 +29,7 @@ function ForumPost({ location }) {
 
   return (
     <Card>
-      {location.image_path && <Card.Img variant="top" src={location.image_path} alt="" />}
+      {location.image_path && <Card.Img variant="top" className="forum-image" src={location.image_path} alt="" />}
       <Card.Body>
         <Card.Title>{location.marker_title || "No Title"}</Card.Title>
         <Card.Text>
@@ -42,7 +42,7 @@ function ForumPost({ location }) {
         <div className="action-container">
           <Button variant="primary" onClick={() => handleVote(location.id, 'increment')}>+1</Button>
           <Button variant="secondary" onClick={() => handleVote(location.id, 'decrement')}>-1</Button>
-          <Accordion style={{ width: '100%' }}>
+          <Accordion>
             <Accordion.Item eventKey="0">
               <Accordion.Header>Comments ({location.comments ? location.comments.length : 0})</Accordion.Header>
               <Accordion.Body>
