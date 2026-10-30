@@ -28,3 +28,52 @@
 .view-forum .forum-list > .card + .card {
   margin-top: 0;
 }
+
+/* Stays visible at the top of the feed while scrolling */
+.forum-filters {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.5rem;
+  background: var(--bs-body-bg, #fff);
+}
+
+.forum-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.forum-filter .form-label {
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.forum-filter .form-select {
+  width: auto;
+}
+
+.forum-count {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: var(--bs-secondary-color, #6c757d);
+}
+
+.forum-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  border: 1px dashed var(--bs-border-color, #dee2e6);
+  border-radius: 0.5rem;
+}
+
+.forum-distance {
+  font-size: 0.875rem;
+}

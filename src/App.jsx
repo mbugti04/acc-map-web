@@ -1,6 +1,6 @@
 import "leaflet/dist/leaflet.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import About from './About'; 
@@ -11,7 +11,8 @@ import MapComponent from './MapComponent';
 import ForumComponent from './ForumComponent';
 import ReportForm from './ReportForm';
 import SplitGutter from './SplitGutter';
-import { DEFAULT_CENTER, DEFAULT_SPLIT } from './constants';
+import { DEFAULT_CENTER, DEFAULT_SPLIT, DEFAULT_RADIUS } from './constants';
+import { distanceMiles } from './geo';
 import { Container, Navbar, Nav, Button, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 
 const VIEWS = [
@@ -50,8 +51,22 @@ function loadView() {
 
 function App() {
   const [locations, setLocations] = useState([]);
-  const [userPosition, setUserPosition] = useState(null);
+  // geoPosition is the GPS fix; userPosition follows the center of the map as the user pans
+  const [geoPosition, setGeoPosition] = useState(null);
+  const [userPosition, setUserPosition] = useState(DEFAULT_CENTER);
   const [draftPin, setDraftPin] = useState(null);
+  const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [sort, setSort] = useState('nearest');
+
+  // Feed shows only posts within the chosen radius of the map's center
+  const nearbyPosts = useMemo(() => {
+    const posts = locations
+      .map(location => ({ ...location, distance: distanceMiles(userPosition, [location.latitude, location.longitude]) }))
+      .filter(post => post.distance <= radius);
+    return sort === 'votes'
+      ? posts.sort((a, b) => b.vote_count - a.vote_count)
+      : posts.sort((a, b) => a.distance - b.distance);
+  }, [locations, userPosition, radius, sort]);
   const [view, setView] = useState(loadView);
   const [split, setSplit] = useState(loadSplit);
   const panesRef = useRef(null);
@@ -85,11 +100,15 @@ function App() {
   useEffect(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      pos => setUserPosition([pos.coords.latitude, pos.coords.longitude]),
+      pos => setGeoPosition([pos.coords.latitude, pos.coords.longitude]),
       err => console.warn("Geolocation unavailable:", err.message),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, []);
+
+  const handleUpdated = (updated) => {
+    setLocations(prev => prev.map(location => location.id === updated.id ? updated : location));
+  };
 
   const handleCreated = (location) => {
     setLocations(prev => [...prev, location]);
@@ -117,7 +136,7 @@ function App() {
               <Nav.Link as={Link} to="/about">About Us</Nav.Link>
               <Nav.Link as={Link} to="/resources">Resources</Nav.Link>
             </Nav>
-            <ReportButton onClick={() => setDraftPin(userPosition || DEFAULT_CENTER)} />
+            <ReportButton onClick={() => setDraftPin(userPosition)} />
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -142,7 +161,9 @@ function App() {
                 <div className="map" id="map">
                   <MapComponent
                     locations={locations}
-                    userPosition={userPosition}
+                    geoPosition={geoPosition}
+                    radiusMiles={radius}
+                    onCenterChange={setUserPosition}
                     draftPin={draftPin}
                     onPick={setDraftPin}
                   />
@@ -151,7 +172,14 @@ function App() {
                   <SplitGutter containerRef={panesRef} split={split} onChange={setSplit} />
                 )}
                 <div className="forum" id="forum">
-                  <ForumComponent locations={locations} />
+                  <ForumComponent
+                    posts={nearbyPosts}
+                    radius={radius}
+                    onRadiusChange={setRadius}
+                    sort={sort}
+                    onSortChange={setSort}
+                    onUpdate={handleUpdated}
+                  />
                 </div>
               </div>
             </div>
